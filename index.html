@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dart Manager Pro v69.4.5 - LEAGUE LABELS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; --player-alert: #ff4500; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
+        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
+        .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+        
+        .match-card.is-live-card { animation: live-pulse 2s infinite ease-in-out; border-color: var(--danger) !important; }
+        @keyframes live-pulse { 0% { background: var(--card); } 50% { background: #2a0a0a; } 100% { background: var(--card); } }
+
+        .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; transition: 0.3s; }
+        .role-pill { padding: 10px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 2px solid #1e293b; color: #fff; flex: 1; font-size: 0.85rem; }
+        
+        .is-playing { background: #450a0a !important; border-color: var(--danger) !important; animation: p-red 1s infinite alternate; }
+        .is-marking { background: #422006 !important; border-color: var(--warn) !important; color: white !important; }
+        .absent-alert { animation: a-flash 0.8s infinite alternate !important; border-color: var(--player-alert) !important; color: white !important; }
+        
+        @keyframes p-red { from { box-shadow: 0 0 2px #f00; } to { box-shadow: 0 0 10px #f00; } }
+        @keyframes a-flash { from { background: #450a0a; } to { background: var(--player-alert); } }
+        
+        .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; display: none; overflow-y: auto; }
+        .active-view { display: block !important; }
+        
+        .att-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .att-item { padding: 20px; text-align: center; background: #1e293b; border-radius: 12px; cursor: pointer; font-weight: 800; border: 3px solid transparent; transition: 0.2s; text-transform: uppercase; }
+        .att-item.is-off { background: #450a0a !important; border-color: var(--danger) !important; color: #fff; }
+
+        .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
+        .wo-tag { color: var(--danger); font-weight: 900; margin-left: 5px; }
+
+        /* LIGA LABEL */
+        .league-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        
+        select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
+        
+        /* OŚ CZASU */
+        .tl-row { display: flex; align-items: center; background: #090e1a; margin-bottom: 4px; border-radius: 8px; padding: 10px; border: 1px solid #1e293b; }
+        .tl-player { width: 200px; font-weight: 800; border-right: 2px solid #1e293b; margin-right: 15px; flex-shrink: 0; }
+        .tl-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tl-box { width: 80px; height: 50px; border-radius: 6px; background: #161b22; font-size: 0.7rem; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; }
+        .tl-done { opacity: 0.2; filter: grayscale(1); }
+        .tl-live { border-color: #fff !important; animation: tl-pulse 1s infinite alternate; box-shadow: 0 0 10px rgba(255,255,255,0.2); z-index: 10; }
+        @keyframes tl-pulse { from { opacity: 1; transform: scale(1.05); } to { opacity: 0.5; transform: scale(1); } }
+
+        /* TV FIX */
+        .tv-row { background: var(--card); border-left: 12px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 4px; }
+        .tv-t-num { width: 120px; font-size: 3rem; font-weight: 900; flex-shrink: 0; }
+        .tv-main { flex: 1; text-align: center; overflow: hidden; }
+        .tv-names { font-size: 2rem; font-weight: 800; white-space: nowrap; }
+        .tv-timer { width: 200px; text-align: right; font-size: 2.5rem; font-weight: 800; color: var(--accent); flex-shrink: 0; font-family: 'Courier New', Courier, monospace; font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+
+<div id="admin-view" class="container active-view">
+    <div class="header">
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v69.4.5</h2>
+        <div style="display:flex; gap:8px">
+            <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
+            <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
+            <button onclick="showUI('tv-view')" class="btn" style="background:var(--accent); color:#000">TV</button>
+            <button onclick="showUI('boards-view')" class="btn" style="background:#fff; color:#000">TARCZE</button>
+            <button onclick="showUI('config-view')" class="btn" style="background:var(--warn); color:#000">USTAWIENIA</button>
+            <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">CSV</button>
+            <input type="file" id="csvIn" style="display:none" onchange="doImport(this)">
+        </div>
+    </div>
+    <div id="tabs" style="display:flex; gap:10px; margin-bottom:20px; overflow-x: auto; padding-bottom: 5px;"></div>
+    <div id="matches"></div>
+</div>
+
+<div id="timeline-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OŚ CZASU</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">POWRÓT</button></div>
+    <div id="timeline-container"></div>
+</div>
+
+<div id="attendance-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OBECNOŚĆ</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
+    <div id="attendance-list" class="att-grid"></div>
+</div>
+
+<div id="config-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center"><h1>USTAWIENIA</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
+    <div style="max-width:600px; margin-top:20px; background:var(--card); padding:20px; border-radius:12px">
+        <label>LICZBA TARCZ:</label><input type="number" id="cfg-b" oninput="state.boards = parseInt(this.value)||1; refresh();" style="width:100%; margin:10px 0">
+        <label>ZARZĄDZANIE LIGAMI:</label><div id="cfg-l" style="margin-top:10px"></div>
+        <button onclick="addL()" class="btn" style="margin-top:15px; background:var(--purple); color:#fff; width:100%">+ DODAJ NOWĄ LIGĘ</button>
+    </div>
+</div>
+
+<div id="tv-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>LIVE TV</h1><button onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button></div>
+    <div id="tv-list"></div>
+</div>
+
+<div id="boards-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>STATUS TARCZ</h1><button onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button></div>
+    <div id="boards-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px"></div>
+</div>
+
+<script>
+    let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
+
+    function triggerImport() { document.getElementById('csvIn').click(); }
+    function doImport(input) {
+        const file = input.files[0]; if(!file) return;
+        const reader = new FileReader();
+        const targetIdx = state.idx;
+        reader.onload = function(e) {
+            const lines = e.target.result.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            const sep = lines[0].includes(';') ? ';' : ',';
+            state.leagues[targetIdx].matches = lines.slice(1).map(line => {
+                const c = line.split(sep).map(x => x.trim());
+                return { id: 'm-'+Math.random().toString(36).substr(2,9), b: parseInt(c[0])||1, t: c[1]||'00:00', h: c[2], g: c[3], m: c[4]||'', s: 'plan', e: '00:00', start: null, isWalkover: false, woLoser: null };
+            });
+            input.value = '';
+            refresh();
+        };
+        reader.readAsText(file);
+    }
+
+    function getAllPlayers() {
+        const p = new Set();
+        state.leagues.forEach(l => l.matches.forEach(m => { if(m.h) p.add(m.h); if(m.g) p.add(m.g); if(m.m) p.add(m.m); }));
+        return Array.from(p).sort();
+    }
+
+    function getPlayerStatus(name) {
+        let status = null;
+        state.leagues.forEach(l => l.matches.forEach(m => {
+            if(m.s === 'live') {
+                if(m.h === name || m.g === name) status = 'playing';
+                else if(m.m === name) status = 'marking';
+            }
+        }));
+        return status;
+    }
+
+    function refresh() {
+        const allP = getAllPlayers();
+        const cur = state.leagues[state.idx];
+        document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
+            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
+        `).join('');
+
+        document.getElementById('cfg-b').value = state.boards;
+        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
+            <div style="display:flex; gap:10px; margin-bottom:10px">
+                <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; refresh();" style="flex:1">
+                <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; refresh();">
+                <button onclick="if(state.leagues.length>1){state.leagues.splice(${i},1); state.idx=0; refresh();}" class="btn" style="background:var(--danger)">X</button>
+            </div>
+        `).join('');
+
+        let html = '';
+        const grouped = cur.matches.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
+        Object.keys(grouped).sort().forEach(time => {
+            html += `<div style="color:var(--warn); margin:15px 0 5px 0; font-size:0.8rem; font-weight:800">🕒 GODZINA ${time}</div>`;
+            grouped[time].forEach(m => {
+                const isOccupied = state.leagues.some(l => l.matches.some(x => x.s==='live' && x.b==m.b && x.id!==m.id));
+                const hS = getPlayerStatus(m.h), gS = getPlayerStatus(m.g), mS = getPlayerStatus(m.m);
+                const hA = state.absentPlayers.includes(m.h), gA = state.absentPlayers.includes(m.g), mA = state.absentPlayers.includes(m.m);
+                const pClass = (s, a) => `role-pill ${a?'absent-alert':(s==='playing'?'is-playing':(s==='marking'?'is-marking':''))}`;
+
+                html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}; opacity:${(m.s==='done'||m.isWalkover)?0.5:1}">
+                    <div style="width:65px"><select onchange="upd('${m.id}','b',parseInt(this.value))" class="${isOccupied?'is-playing':''}">
+                        ${Array.from({length:state.boards},(_,i)=>`<option value="${i+1}" ${m.b==i+1?'selected':''}>T${i+1}</option>`).join('')}
+                    </select></div>
+                    <div class="${pClass(hS, hA)}">${m.h}${m.woLoser===m.h?' <span class="wo-tag">(W)</span>':''}</div>
+                    <div style="opacity:0.3; font-weight:800">VS</div>
+                    <div class="${pClass(gS, gA)}">${m.g}${m.woLoser===m.g?' <span class="wo-tag">(W)</span>':''}</div>
+                    <div style="flex:1.2"><select onchange="upd('${m.id}','m',this.value)" style="width:100%" class="${pClass(mS, mA)}">
+                        <option value="">-- MARKER --</option>${allP.map(p => `<option value="${p}" ${m.m===p?'selected':''}>${p}</option>`).join('')}
+                    </select></div>
+                    <div style="width:200px; text-align:right">
+                        ${m.s==='plan' && !m.isWalkover ? `
+                            <button onclick="start('${m.id}')" class="btn" style="background:var(--accent); color:#000" ${ (isOccupied||hS||gS||mS||hA||gA||mA)?'disabled':'' }>START</button>
+                            <button onclick="walk('${m.id}')" class="btn" style="background:#444; color:#fff">W.O.</button>
+                        ` : ''}
+                        ${m.s==='live' ? `<span id="t-${m.id}" style="color:var(--accent); font-weight:800; margin-right:10px; font-variant-numeric:tabular-nums">${m.e}</span><button onclick="stop('${m.id}')" class="btn" style="background:var(--danger)">STOP</button>` : ''}
+                        ${(m.s==='done'||m.isWalkover) ? `<span style="color:var(--warn); margin-right:10px; font-size:0.7rem">${m.isWalkover?'WALKOWER':'KONIEC'}</span><button onclick="reset('${m.id}')" class="btn" style="background:#222">RESET</button>` : ''}
+                    </div>
+                </div>`;
+            });
+        });
+        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.2; padding:40px">WYBIERZ LIGĘ I ZAIMPORTUJ CSV</p>';
+    }
+
+    function addL() { state.leagues.push({ name: 'LIGA ' + (state.leagues.length+1), color: '#a855f7', matches: [] }); refresh(); }
+    function walk(id) {
+        state.leagues.forEach(l => l.matches.forEach(m => {
+            if(m.id===id){
+                const p = prompt(`Kto przegrał walkowerem?\n1 - ${m.h}\n2 - ${m.g}`);
+                if(p==="1"){ m.woLoser=m.h; m.s='done'; m.isWalkover=true; }
+                else if(p==="2"){ m.woLoser=m.g; m.s='done'; m.isWalkover=true; }
+            }
+        }));
+        refresh();
+    }
+
+    function openTimeline() {
+        const players = getAllPlayers();
+        let html = '';
+        players.forEach(p => {
+            let evs = [];
+            state.leagues.forEach(l => l.matches.forEach(m => { 
+                if(m.h===p || m.g===p || m.m===p) {
+                    const isAnyAbsent = state.absentPlayers.includes(m.h) || state.absentPlayers.includes(m.g) || state.absentPlayers.includes(m.m);
+                    evs.push({ t:m.t, r:(m.h===p||m.g===p?'P':'M'), s:m.s, w:m.isWalkover, a: isAnyAbsent }); 
+                }
+            }));
+            evs.sort((a,b)=>a.t.localeCompare(b.t));
+            const isP_Absent = state.absentPlayers.includes(p);
+            html += `<div class="tl-row ${isP_Absent?'absent-alert':''}">
+                <div class="tl-player">${p}${isP_Absent?' (NIEOBECNY)':''}</div>
+                <div class="tl-grid">
+                ${evs.map(e => `
+                    <div class="tl-box ${(e.s==='done'||e.w)?'tl-done':''} ${e.s==='live'?'tl-live':''} ${e.a?'absent-alert':''}" 
+                         style="border-color:${e.r==='P'?'var(--accent)':'var(--purple)'}">
+                        <b>${e.t}</b><span>${e.r==='P'?'GRA':'LICZY'}</span>
+                    </div>`).join('')}
+            </div></div>`;
+        });
+        document.getElementById('timeline-container').innerHTML = html || '<p style="text-align:center; opacity:0.3">BRAK DANYCH</p>';
+        showUI('timeline-view');
+    }
+
+    function renderTV() {
+        let live = []; 
+        state.leagues.forEach(l => l.matches.forEach(m => { 
+            if(m.s==='live') live.push({...m, col: l.color, leagueName: l.name}); 
+        }));
+        live.sort((a,b) => a.b - b.b);
+        document.getElementById('tv-list').innerHTML = live.map(m => `
+            <div class="tv-row" style="border-left-color:${m.col}">
+                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
+                <div class="tv-main">
+                    <div class="league-label" style="color:${m.col}">${m.leagueName}</div>
+                    <div class="tv-names">${m.h} <span style="opacity:0.2">VS</span> ${m.g}</div>
+                    <div style="color:var(--warn); font-size:1rem; font-weight:700">LICZY: ${m.m || '---'}</div>
+                </div>
+                <div class="tv-timer" id="tvt-${m.id}">${m.e}</div>
+            </div>`).join('');
+    }
+
+    function renderBoards() {
+        let h = '';
+        for(let i=1; i<=state.boards; i++) {
+            let m = null; 
+            state.leagues.forEach(l => l.matches.forEach(x => { 
+                if(x.s==='live' && x.b==i) m={...x, col: l.color, leagueName: l.name}; 
+            }));
+            h += `<div style="padding:20px; background:#000; border:2px solid ${m?m.col:'#222'}; border-radius:12px">
+                <div class="league-label" style="color:${m?m.col:'#333'}">${m ? m.leagueName : '&nbsp;'}</div>
+                <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
+                <div style="font-weight:700; margin:5px 0; height:30px">${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
+                <div style="font-size:0.8rem; color:var(--warn); height:20px">${m?'Marker: '+(m.m||'--'):''}</div>
+                <div style="font-size:1.1rem; color:var(--accent); font-weight:800; font-variant-numeric:tabular-nums" id="bt-${m?m.id:''}">${m?m.e:''}</div>
+            </div>`;
+        }
+        document.getElementById('boards-grid').innerHTML = h;
+    }
+
+    function start(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } })); refresh(); }
+    function stop(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id) m.s='done'; })); refresh(); }
+    function reset(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id){ m.s='plan'; m.isWalkover=false; m.woLoser=null; m.e='00:00'; } })); refresh(); }
+    function upd(id, f, v) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id) m[f]=v; })); refresh(); }
+    function toggleA(n) { const i = state.absentPlayers.indexOf(n); if(i===-1) state.absentPlayers.push(n); else state.absentPlayers.splice(i,1); showAttendance(); refresh(); }
+    function showAttendance() {
+        const p = getAllPlayers();
+        document.getElementById('attendance-list').innerHTML = p.map(n => `
+            <div class="att-item ${state.absentPlayers.includes(n)?'is-off':''}" onclick="toggleA('${n}')">
+                ${n}
+            </div>`).join('');
+        showUI('attendance-view');
+    }
+    function showUI(id) { 
+        document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view'));
+        document.getElementById(id).classList.add('active-view');
+        if(id==='tv-view') renderTV();
+        if(id==='boards-view') renderBoards();
+    }
+
+    setInterval(() => {
+        state.leagues.forEach(l => l.matches.forEach(m => {
+            if(m.s === 'live' && m.start) {
+                const d = Math.floor((Date.now() - m.start) / 1000);
+                m.e = Math.floor(d/60).toString().padStart(2,'0')+':'+(d%60).toString().padStart(2,'0');
+                ['t-', 'tvt-', 'bt-'].forEach(p => { const el = document.getElementById(p + m.id); if(el) el.innerText = m.e; });
+            }
+        }));
+    }, 1000);
+    refresh();
+</script>
+</body>
+</html>
