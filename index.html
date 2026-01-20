@@ -2,46 +2,42 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v62.7 - TURBO STABLE FINAL</title>
+    <title>Dart Manager Pro v62.9 - BOARDS MARKER FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; --player-alert: #ff4500; }
+        :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
         .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
-        .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; transition: 0.3s; }
-        .is-live-card { animation: live-pulse 2s infinite ease-in-out; border-color: var(--danger) !important; }
-        @keyframes live-pulse { 0%, 100% { background: var(--card); } 50% { background: #2a0a0a; } }
+        .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; }
         .role-pill { padding: 10px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 2px solid #1e293b; color: #fff; flex: 1; font-size: 0.85rem; }
-        .is-playing { background: #450a0a !important; border-color: var(--danger) !important; animation: p-red 1s infinite alternate; }
-        .is-marking { background: #422006 !important; border-color: var(--warn) !important; }
-        .absent-alert { animation: a-flash 0.8s infinite alternate !important; border-color: var(--player-alert) !important; }
-        @keyframes p-red { from { box-shadow: 0 0 2px #f00; } to { box-shadow: 0 0 10px #f00; } }
-        @keyframes a-flash { from { background: #450a0a; } to { background: var(--player-alert); } }
         .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; display: none; overflow-y: auto; }
         .active-view { display: block !important; }
-        .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
+        .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); text-transform: uppercase; font-size: 0.8rem; }
         select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
-        .tl-row { display: flex; align-items: center; background: #090e1a; margin-bottom: 4px; border-radius: 8px; padding: 10px; border: 1px solid #1e293b; }
-        .tl-player { width: 200px; font-weight: 800; border-right: 2px solid #1e293b; margin-right: 15px; flex-shrink: 0; }
-        .tl-box { width: 80px; height: 50px; border-radius: 6px; background: #161b22; font-size: 0.7rem; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 5px; }
-        .tl-done { opacity: 0.2; filter: grayscale(1); }
-        .tv-row { background: var(--card); border-left: 15px solid transparent; padding: 30px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 8px; }
+        
+        /* STYL TV */
+        .tv-row { background: var(--card); border-left: 15px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 8px; border: 1px solid #1e293b; }
         .tv-t-num { width: 140px; font-size: 4rem; font-weight: 900; }
         .tv-main { flex: 1; text-align: center; }
-        .tv-names { font-size: 3rem; font-weight: 800; }
+        .tv-names { font-size: 3.5rem; font-weight: 800; }
         .tv-timer { width: 250px; text-align: right; font-size: 3.5rem; color: var(--accent); font-family: monospace; font-variant-numeric: tabular-nums; }
+        .tv-marker { color: var(--warn); font-size: 1.5rem; font-weight: 700; margin-top: 5px; }
+
+        /* SIATKA TARCZ */
+        .boards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .board-box { padding: 20px; background: #000; border-radius: 12px; border: 2px solid #222; transition: 0.3s; }
+        .board-active { border-color: var(--accent); }
     </style>
 </head>
 <body>
 
-<div id="admin-view" class="container active-view">
+<div id="admin-view" class="container">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER v62.7</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER v62.9</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
@@ -56,33 +52,25 @@
     <div id="matches"></div>
 </div>
 
-<div id="timeline-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OŚ CZASU</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">POWRÓT</button></div>
-    <div id="timeline-container"></div>
+<div id="tv-view" class="modal-view">
+    <div id="tv-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+        <h1 style="color:var(--accent); margin:0">LIVE SCOREBOARD</h1>
+        <button id="tv-exit-btn" onclick="exitTV()" class="btn" style="background:#333; color:#fff">POWRÓT ADMIN</button>
+    </div>
+    <div id="tv-list"></div>
+</div>
+
+<div id="boards-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+        <h1 style="margin:0">PODGLĄD TARCZ</h1>
+        <button onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button>
+    </div>
+    <div id="boards-grid" class="boards-grid"></div>
 </div>
 
 <div id="attendance-view" class="modal-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OBECNOŚĆ</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
     <div id="attendance-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px"></div>
-</div>
-
-<div id="config-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center"><h1>USTAWIENIA</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
-    <div style="max-width:600px; margin-top:20px; background:var(--card); padding:20px; border-radius:12px">
-        <label>LICZBA TARCZ:</label><input type="number" id="cfg-b" oninput="state.boards = parseInt(this.value)||1; sync();" style="width:100%; margin:10px 0">
-        <label>LIGI:</label><div id="cfg-l" style="margin-top:10px"></div>
-        <button onclick="addL()" class="btn" style="margin-top:15px; background:var(--purple); color:#fff; width:100%">+ DODAJ LIGĘ</button>
-    </div>
-</div>
-
-<div id="tv-view" class="modal-view">
-    <div id="tv-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px"><h1 style="color:var(--accent); margin:0">LIVE STREAM</h1><button onclick="showUI('admin-view')" class="btn" style="background:#333; color:#fff">POWRÓT ADMIN</button></div>
-    <div id="tv-list"></div>
-</div>
-
-<div id="boards-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px"><h1 style="margin:0">TARCZE</h1><button onclick="showUI('admin-view')" class="btn" style="background:#333; color:#fff">POWRÓT</button></div>
-    <div id="boards-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px"></div>
 </div>
 
 <script>
@@ -100,195 +88,105 @@
     const db = firebase.database().ref('dart_system_v62');
 
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
-    let currentUI = window.location.search.includes('tv') ? 'tv-view' : 'admin-view';
+    const isTVMode = window.location.search.includes('tv');
+    let currentUI = isTVMode ? 'tv-view' : 'admin-view';
 
     function sync() { db.set(state); }
-    db.on('value', (s) => { if(s.val()) { state = s.val(); refresh(); } });
-
-    function getAllPlayers() {
-        const p = new Set();
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.h) p.add(m.h); if(m.g) p.add(m.g); if(m.m) p.add(m.m); }));
-        return Array.from(p).sort();
-    }
-
-    function getPlayerStatus(name) {
-        let status = null;
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => {
-            if(m.s === 'live') {
-                if(m.h === name || m.g === name) status = 'playing';
-                else if(m.m === name) status = 'marking';
-            }
-        }));
-        return status;
-    }
+    db.on('value', (s) => { if(s.val()) { state = s.val(); if(isTVMode) currentUI = 'tv-view'; refresh(); } });
 
     function refresh() {
-        if(!state.leagues[state.idx]) state.idx = 0;
-        const cur = state.leagues[state.idx];
-        const allP = getAllPlayers();
-
-        // Nagłówki i Taby
-        document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
-            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
-        `).join('');
-
-        // Config
-        document.getElementById('cfg-b').value = state.boards;
-        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
-            <div style="display:flex; gap:10px; margin-bottom:10px">
-                <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; sync();" style="flex:1">
-                <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; sync();">
-                <button onclick="if(state.leagues.length>1){state.leagues.splice(${i},1); state.idx=0; sync();}" class="btn" style="background:var(--danger)">X</button>
-            </div>`).join('');
-
-        // Mecze
-        let html = '';
-        const mArr = cur.matches || [];
-        const grouped = mArr.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
-        Object.keys(grouped).sort().forEach(time => {
-            html += `<div style="color:var(--warn); margin:15px 0 5px 0; font-size:0.8rem; font-weight:800">🕒 GODZINA ${time}</div>`;
-            grouped[time].forEach(m => {
-                const isOccupied = state.leagues.some(l => (l.matches||[]).some(x => x.s==='live' && x.b==m.b && x.id!==m.id));
-                const hS = getPlayerStatus(m.h), gS = getPlayerStatus(m.g), mS = getPlayerStatus(m.m);
-                const hA = (state.absentPlayers||[]).includes(m.h), gA = (state.absentPlayers||[]).includes(m.g), mA = (state.absentPlayers||[]).includes(m.m);
-                const pClass = (s, a) => `role-pill ${a?'absent-alert':(s==='playing'?'is-playing':(s==='marking'?'is-marking':''))}`;
-
-                html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}; opacity:${(m.s==='done'||m.isWalkover)?0.5:1}">
-                    <div style="width:65px"><select onchange="upd('${m.id}','b',parseInt(this.value))">
-                        ${Array.from({length:state.boards},(_,i)=>`<option value="${i+1}" ${m.b==i+1?'selected':''}>T${i+1}</option>`).join('')}
-                    </select></div>
-                    <div class="${pClass(hS, hA)}">${m.h}${m.woLoser===m.h?' (W)':''}</div>
-                    <div class="${pClass(gS, gA)}">${m.g}${m.woLoser===m.g?' (W)':''}</div>
-                    <div style="flex:1.2"><select onchange="upd('${m.id}','m',this.value)" style="width:100%" class="${pClass(mS, mA)}">
-                        <option value="">-- MARKER --</option>${allP.map(p => `<option value="${p}" ${m.m===p?'selected':''}>${p}</option>`).join('')}
-                    </select></div>
-                    <div style="width:180px; text-align:right">
-                        ${m.s==='plan' && !m.isWalkover ? `<button onclick="start('${m.id}')" class="btn" style="background:var(--accent); color:#000" ${ (isOccupied||hS||gS||mS||hA||gA||mA)?'disabled':'' }>START</button> <button onclick="walk('${m.id}')" class="btn" style="background:#444; color:#fff">W.O.</button>` : ''}
-                        ${m.s==='live' ? `<span style="color:var(--accent); font-weight:800; margin-right:10px">${m.e}</span><button onclick="stop('${m.id}')" class="btn" style="background:var(--danger)">STOP</button>` : ''}
-                        ${(m.s==='done'||m.isWalkover) ? `<button onclick="reset('${m.id}')" class="btn" style="background:#222">RESET</button>` : ''}
-                    </div>
-                </div>`;
-            });
-        });
-        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.3">ZAIMPORTUJ CSV DLA TEJ LIGI</p>';
+        if(currentUI === 'tv-view') renderTV();
+        else if(currentUI === 'boards-view') renderBoards();
+        else renderAdmin();
         showUI(currentUI, true);
-    }
-
-    function showUI(id, isRefresh = false) {
-        if(!isRefresh) currentUI = id;
-        document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view'));
-        document.getElementById(id).classList.add('active-view');
-        if(window.location.search.includes('tv')) document.getElementById('tv-header').style.display = 'none';
-        if(id==='tv-view') renderTV();
-        if(id==='boards-view') renderBoards();
-    }
-
-    function start(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } }); sync(); }
-    function stop(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id) m.s='done'; }); sync(); }
-    function reset(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='plan'; m.isWalkover=false; m.woLoser=null; m.e='00:00'; } }); sync(); }
-    function upd(id, f, v) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id) m[f]=v; }); sync(); }
-    function addL() { state.leagues.push({ name: 'LIGA ' + (state.leagues.length+1), color: '#a855f7', matches: [] }); sync(); }
-
-    function walk(id) {
-        state.leagues[state.idx].matches.forEach(m => {
-            if(m.id===id){
-                const p = prompt(`Kto przegrał?\n1 - ${m.h}\n2 - ${m.g}`);
-                if(p==="1"){ m.woLoser=m.h; m.s='done'; m.isWalkover=true; }
-                else if(p==="2"){ m.woLoser=m.g; m.s='done'; m.isWalkover=true; }
-                if(p) sync();
-            }
-        });
-    }
-
-    function doImport(input) {
-        const file = input.files[0]; if(!file) return;
-        const reader = new FileReader();
-        const tIdx = state.idx;
-        reader.onload = (e) => {
-            const lines = e.target.result.split(/\r?\n/).filter(l => l.trim().length > 1);
-            const sep = lines[0].includes(';') ? ';' : ',';
-            state.leagues[tIdx].matches = lines.slice(1).map(l => {
-                const c = l.split(sep).map(x => x.trim());
-                return { id: 'm-'+Math.random().toString(36).substr(2,9), b: parseInt(c[0])||1, t: c[1]||'00:00', h: c[2], g: c[3], m: c[4]||'', s: 'plan', e: '00:00', start: null, isWalkover: false };
-            });
-            sync(); input.value = '';
-        };
-        reader.readAsText(file);
-    }
-
-    function triggerImport() { document.getElementById('csvIn').click(); }
-
-    function renderTV() {
-        let live = []; 
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
-        live.sort((a,b) => a.b - b.b);
-        document.getElementById('tv-list').innerHTML = live.length ? live.map(m => `
-            <div class="tv-row" style="border-left-color:${m.col}">
-                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
-                <div class="tv-main"><div class="tv-names">${m.h} VS ${m.g}</div><div style="color:var(--warn); font-size:1.5rem">LICZY: ${m.m||'--'}</div></div>
-                <div class="tv-timer">${m.e}</div>
-            </div>`).join('') : '<h1 style="text-align:center; opacity:0.2; margin-top:100px; font-size:4rem">OCZEKIWANIE NA MECZE...</h1>';
     }
 
     function renderBoards() {
         let h = '';
         for(let i=1; i<=state.boards; i++) {
-            let m = null; state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
-            h += `<div style="padding:20px; background:#000; border:2px solid ${m?m.col:'#222'}; border-radius:12px">
+            let m = null; 
+            state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
+            
+            h += `
+            <div class="board-box ${m?'board-active':''}" style="${m?`border-color:${m.col}`:''}">
                 <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
-                <div style="height:40px; margin:10px 0; font-weight:800">${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
-                <div style="color:var(--accent); font-size:1.5rem">${m?m.e:''}</div>
+                <div style="margin:10px 0; font-weight:800; min-height:40px; font-size:1.1rem">
+                    ${m ? `${m.h} vs ${m.g}` : '<span style="opacity:0.2">WOLNA</span>'}
+                </div>
+                <div style="color:var(--warn); font-weight:700; font-size:0.9rem; min-height:20px">
+                    ${m ? `MARKER: ${m.m || 'BRAK'}` : ''}
+                </div>
+                <div style="margin-top:10px; color:var(--accent); font-size:1.5rem; font-weight:800; font-family:monospace">
+                    ${m ? m.e : ''}
+                </div>
             </div>`;
         }
         document.getElementById('boards-grid').innerHTML = h;
     }
 
-    function openTimeline() {
-        const players = getAllPlayers();
-        let html = '';
-        players.forEach(p => {
-            let evs = [];
-            state.leagues.forEach(l => (l.matches||[]).forEach(m => { 
-                if(m.h===p || m.g===p || m.m===p) {
-                    const isAnyA = (state.absentPlayers||[]).includes(m.h) || (state.absentPlayers||[]).includes(m.g) || (m.m && (state.absentPlayers||[]).includes(m.m));
-                    evs.push({ t:m.t, r:(m.h===p||m.g===p?'P':'M'), s:m.s, a: isAnyA }); 
-                }
-            }));
-            evs.sort((a,b)=>a.t.localeCompare(b.t));
-            const isP_A = (state.absentPlayers||[]).includes(p);
-            html += `<div class="tl-row ${isP_A?'absent-alert':''}">
-                <div class="tl-player">${p}</div>
-                <div style="display:flex; gap:5px; flex-wrap:wrap">${evs.map(e => `
-                    <div class="tl-box ${e.s==='done'?'tl-done':''} ${e.s==='live'?'tl-live':''} ${e.a?'absent-alert':''}" style="border-color:${e.r==='P'?'var(--accent)':'var(--purple)'}">
-                        <b>${e.t}</b><span>${e.r==='P'?'GRA':'LICZY'}</span>
-                    </div>`).join('')}</div></div>`;
+    function renderTV() {
+        let live = []; 
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
+        live.sort((a,b) => a.b - b.b);
+        const html = live.length ? live.map(m => `
+            <div class="tv-row" style="border-left-color:${m.col}">
+                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
+                <div class="tv-main">
+                    <div class="tv-names">${m.h} <span style="opacity:0.3">VS</span> ${m.g}</div>
+                    <div class="tv-marker">MARKER: ${m.m||'--'}</div>
+                </div>
+                <div class="tv-timer">${m.e}</div>
+            </div>`).join('') : '<h1 style="text-align:center; opacity:0.1; margin-top:200px; font-size:5rem">CZEKAMY NA MECZE...</h1>';
+        document.getElementById('tv-list').innerHTML = html;
+    }
+
+    function renderAdmin() {
+        if(!state.leagues[state.idx]) state.idx = 0;
+        const cur = state.leagues[state.idx];
+        document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
+            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
+        `).join('');
+        let h = '';
+        (cur.matches || []).forEach(m => {
+            h += `<div class="match-card" style="border-left-color:${cur.color}">
+                <div style="width:50px">T${m.b}</div>
+                <div class="role-pill">${m.h}</div>
+                <div class="role-pill">${m.g}</div>
+                <div style="width:150px; text-align:right">
+                    ${m.s==='plan'?`<button onclick="start('${m.id}')" class="btn" style="background:var(--accent)">START</button>`:''}
+                    ${m.s==='live'?`<span style="color:var(--accent); font-weight:800; margin-right:10px">${m.e}</span><button onclick="stop('${m.id}')" class="btn" style="background:var(--danger)">STOP</button>`:''}
+                </div>
+            </div>`;
         });
-        document.getElementById('timeline-container').innerHTML = html || 'BRAK DANYCH';
-        showUI('timeline-view');
+        document.getElementById('matches').innerHTML = h || '<p>BRAK DANYCH</p>';
     }
 
-    function showAttendance() {
-        document.getElementById('attendance-list').innerHTML = getAllPlayers().map(n => `
-            <div class="att-item ${(state.absentPlayers||[]).includes(n)?'is-off':''}" style="padding:20px; text-align:center; background:#1e293b; border-radius:12px; cursor:pointer; font-weight:800; border:3px solid ${(state.absentPlayers||[]).includes(n)?'var(--danger)':'transparent'}" onclick="toggleA('${n}')">${n}</div>`).join('');
-        showUI('attendance-view');
+    function showUI(id, isRefresh = false) {
+        if(!isRefresh) currentUI = id;
+        document.getElementById('admin-view').classList.remove('active-view');
+        document.querySelectorAll('.modal-view').forEach(m => m.classList.remove('active-view'));
+        const target = document.getElementById(id);
+        if(target) target.classList.add('active-view');
+        if(isTVMode) {
+            const btn = document.getElementById('tv-exit-btn');
+            if(btn) btn.style.display = 'none';
+        }
     }
 
-    function toggleA(n) {
-        if(!state.absentPlayers) state.absentPlayers = [];
-        const i = state.absentPlayers.indexOf(n);
-        if(i===-1) state.absentPlayers.push(n); else state.absentPlayers.splice(i,1);
-        sync(); showAttendance();
-    }
+    function start(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } }); sync(); }
+    function stop(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id) m.s='done'; }); sync(); }
+    function exitTV() { currentUI = 'admin-view'; refresh(); }
 
     setInterval(() => {
+        let changed = false;
         state.leagues.forEach(l => (l.matches||[]).forEach(m => {
             if(m.s === 'live' && m.start) {
                 const d = Math.floor((Date.now() - m.start) / 1000);
                 m.e = Math.floor(d/60).toString().padStart(2,'0')+':'+(d%60).toString().padStart(2,'0');
+                changed = true;
             }
         }));
-        if(currentUI === 'tv-view') renderTV();
-        if(currentUI === 'boards-view') renderBoards();
+        if(changed) refresh();
     }, 1000);
 </script>
 </body>
