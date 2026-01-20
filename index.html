@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v62.1 - ONLINE STABLE</title>
+    <title>Dart Manager Pro v62.3 - ONLINE TURBO STABLE</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -47,7 +47,7 @@
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART ONLINE v62.1</h2>
+        <h2 style="margin:0; color:var(--accent)">DART ONLINE v62.3</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
@@ -105,19 +105,18 @@
 
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
 
-    // SYNC
     function sync() { db.set(state); }
     db.on('value', (s) => { if(s.val()) { state = s.val(); refresh(); } });
 
     function getAllPlayers() {
         const p = new Set();
-        state.leagues.forEach(l => l.matches.forEach(m => { if(m.h) p.add(m.h); if(m.g) p.add(m.g); if(m.m) p.add(m.m); }));
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.h) p.add(m.h); if(m.g) p.add(m.g); if(m.m) p.add(m.m); }));
         return Array.from(p).sort();
     }
 
     function getPlayerStatus(name) {
         let status = null;
-        state.leagues.forEach(l => l.matches.forEach(m => {
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => {
             if(m.s === 'live') {
                 if(m.h === name || m.g === name) status = 'playing';
                 else if(m.m === name) status = 'marking';
@@ -127,15 +126,14 @@
     }
 
     function refresh() {
+        if(!state.leagues[state.idx]) state.idx = 0;
         const cur = state.leagues[state.idx];
         const allP = getAllPlayers();
 
-        // Taby
         document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
             <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
         `).join('');
 
-        // Config
         document.getElementById('cfg-b').value = state.boards;
         document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
             <div style="display:flex; gap:10px; margin-bottom:10px">
@@ -144,15 +142,15 @@
                 <button onclick="if(state.leagues.length>1){state.leagues.splice(${i},1); state.idx=0; sync();}" class="btn" style="background:var(--danger)">X</button>
             </div>`).join('');
 
-        // Mecze
         let html = '';
-        const grouped = cur.matches.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
+        const matchesArr = cur.matches || [];
+        const grouped = matchesArr.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
         Object.keys(grouped).sort().forEach(time => {
             html += `<div style="color:var(--warn); margin:15px 0 5px 0; font-size:0.8rem; font-weight:800">🕒 GODZINA ${time}</div>`;
             grouped[time].forEach(m => {
-                const isOccupied = state.leagues.some(l => l.matches.some(x => x.s==='live' && x.b==m.b && x.id!==m.id));
+                const isOccupied = state.leagues.some(l => (l.matches||[]).some(x => x.s==='live' && x.b==m.b && x.id!==m.id));
                 const hS = getPlayerStatus(m.h), gS = getPlayerStatus(m.g), mS = getPlayerStatus(m.m);
-                const hA = state.absentPlayers.includes(m.h), gA = state.absentPlayers.includes(m.g), mA = state.absentPlayers.includes(m.m);
+                const hA = (state.absentPlayers||[]).includes(m.h), gA = (state.absentPlayers||[]).includes(m.g), mA = (state.absentPlayers||[]).includes(m.m);
                 const pClass = (s, a) => `role-pill ${a?'absent-alert':(s==='playing'?'is-playing':(s==='marking'?'is-marking':''))}`;
 
                 html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}; opacity:${(m.s==='done'||m.isWalkover)?0.5:1}">
@@ -180,7 +178,6 @@
         if(document.getElementById('boards-view').classList.contains('active-view')) renderBoards();
     }
 
-    // FUNKCJE LOGIKI
     function start(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } }); sync(); }
     function stop(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id) m.s='done'; }); sync(); }
     function reset(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='plan'; m.isWalkover=false; m.woLoser=null; m.e='00:00'; } }); sync(); }
@@ -218,14 +215,14 @@
         let html = '';
         players.forEach(p => {
             let evs = [];
-            state.leagues.forEach(l => l.matches.forEach(m => { 
+            state.leagues.forEach(l => (l.matches||[]).forEach(m => { 
                 if(m.h===p || m.g===p || m.m===p) {
-                    const isAnyAbsent = state.absentPlayers.includes(m.h) || state.absentPlayers.includes(m.g) || (m.m && state.absentPlayers.includes(m.m));
+                    const isAnyAbsent = (state.absentPlayers||[]).includes(m.h) || (state.absentPlayers||[]).includes(m.g) || (m.m && (state.absentPlayers||[]).includes(m.m));
                     evs.push({ t:m.t, r:(m.h===p||m.g===p?'P':'M'), s:m.s, a: isAnyAbsent }); 
                 }
             }));
             evs.sort((a,b)=>a.t.localeCompare(b.t));
-            const isP_A = state.absentPlayers.includes(p);
+            const isP_A = (state.absentPlayers||[]).includes(p);
             html += `<div class="tl-row ${isP_A?'absent-alert':''}">
                 <div class="tl-player">${p}</div>
                 <div style="display:flex; gap:5px">${evs.map(e => `
@@ -238,7 +235,7 @@
     }
 
     function renderTV() {
-        let live = []; state.leagues.forEach(l => l.matches.forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
+        let live = []; state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
         live.sort((a,b) => a.b - b.b);
         document.getElementById('tv-list').innerHTML = live.map(m => `
             <div class="tv-row" style="border-left-color:${m.col}">
@@ -251,7 +248,7 @@
     function renderBoards() {
         let h = '';
         for(let i=1; i<=state.boards; i++) {
-            let m = null; state.leagues.forEach(l => l.matches.forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
+            let m = null; state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
             h += `<div style="padding:20px; background:#000; border:2px solid ${m?m.col:'#222'}; border-radius:12px">
                 <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
                 <div>${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
@@ -264,12 +261,13 @@
     function showAttendance() {
         const p = getAllPlayers();
         document.getElementById('attendance-list').innerHTML = p.map(n => `
-            <div class="att-item ${state.absentPlayers.includes(n)?'is-off':''}" onclick="toggleA('${n}')">${n}</div>
+            <div class="att-item ${(state.absentPlayers||[]).includes(n)?'is-off':''}" onclick="toggleA('${n}')">${n}</div>
         `).join('');
         showUI('attendance-view');
     }
 
     function toggleA(n) {
+        if(!state.absentPlayers) state.absentPlayers = [];
         const i = state.absentPlayers.indexOf(n);
         if(i===-1) state.absentPlayers.push(n); else state.absentPlayers.splice(i,1);
         sync(); showAttendance();
@@ -287,13 +285,14 @@
     if(window.location.search.includes('tv')) showUI('tv-view');
 
     setInterval(() => {
-        state.leagues.forEach(l => l.matches.forEach(m => {
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => {
             if(m.s === 'live' && m.start) {
                 const d = Math.floor((Date.now() - m.start) / 1000);
                 m.e = Math.floor(d/60).toString().padStart(2,'0')+':'+(d%60).toString().padStart(2,'0');
             }
         }));
         if(document.querySelector('.active-view').id === 'tv-view') renderTV();
+        if(document.querySelector('.active-view').id === 'boards-view') renderBoards();
     }, 1000);
 </script>
 </body>
