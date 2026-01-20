@@ -2,16 +2,16 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v61.4.7 - TURBO STABLE</title>
+    <title>Dart Manager Pro v61.4.8 - TV FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; --player-alert: #ff4500; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
         
-        /* STRAŻNIK WIDOKU TV - DODAJE TYLKO TO */
-        body.tv-active #admin-view, body.tv-active .header { display: none !important; }
-        body.tv-active #tv-view { display: block !important; position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 40px; }
-        body.tv-active .tv-return-btn { display: none !important; }
+        /* TRYB TV - TYLKO GDY BODY MA KLASĘ TV-MODE */
+        body.tv-mode #admin-view, body.tv-mode .header { display: none !important; }
+        body.tv-mode #tv-view { display: block !important; position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 40px; }
+        body.tv-mode .tv-return-btn { display: none !important; }
 
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
@@ -71,11 +71,11 @@
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v61.4.7</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v61.4.8</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
-            <button onclick="window.location.search='?view=tv'" class="btn" style="background:var(--accent); color:#000">LINK TV</button>
+            <button onclick="toggleTVView()" class="btn" style="background:var(--accent); color:#000">TRYB TV (FULL)</button>
             <button onclick="showUI('boards-view')" class="btn" style="background:#fff; color:#000">TARCZE</button>
             <button onclick="showUI('config-view')" class="btn" style="background:var(--warn); color:#000">USTAWIENIA</button>
             <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">CSV</button>
@@ -106,7 +106,7 @@
 </div>
 
 <div id="tv-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>LIVE TV</h1><button onclick="window.location.search=''" class="btn tv-return-btn" style="background:#fff">POWRÓT</button></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>LIVE TV</h1><button onclick="toggleTVView()" class="btn tv-return-btn" style="background:#fff">POWRÓT DO ADMINA</button></div>
     <div id="tv-list"></div>
 </div>
 
@@ -118,9 +118,15 @@
 <script>
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
 
-    /* STRAŻNIK TV */
+    // FUNKCJA PRZEŁĄCZANIA WIDOKU BEZ ODŚWIEŻANIA
+    function toggleTVView() {
+        const isTV = document.body.classList.toggle('tv-mode');
+        if(isTV) renderTV();
+    }
+
+    // SPRAWDZENIE STARTOWE (JEŚLI KTOŚ RĘCZNIE WPISZE URL)
     if (window.location.search.includes('view=tv')) {
-        document.body.classList.add('tv-active');
+        document.body.classList.add('tv-mode');
     }
 
     function triggerImport() { document.getElementById('csvIn').click(); }
