@@ -2,42 +2,39 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v69.5.1 - SECURE TV</title>
+    <title>Dart Manager Pro v69.5.2 - FIXED VIEW</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
         
-        /* STRAŻNIK WIDOKU TV */
-        body.is-tv-only #admin-view, 
-        body.is-tv-only .header, 
-        body.is-tv-only #attendance-view, 
-        body.is-tv-only #config-view,
-        body.is-tv-only #timeline-view,
-        body.is-tv-only .btn { display: none !important; }
-        
-        body.is-tv-only #tv-view { display: block !important; position: absolute; inset: 0; padding: 40px; background: var(--bg); }
-        body.is-tv-only #tv-header button { display: none !important; }
+        /* Ukrywanie widoków - Domyślnie */
+        .modal-view { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; overflow-y: auto; }
+        .active-view { display: block !important; }
+
+        /* INTELIGENTNY STRAŻNIK WIDOKU */
+        body.is-tv-mode #admin-view { display: none !important; }
+        body.is-tv-mode #tv-view { display: block !important; position: static; padding: 40px; }
+        body.is-tv-mode #tv-header button { display: none !important; } /* Ukrywa przycisk powrotu na TV */
 
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
         .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
         
+        /* ADMIN CARDS */
         .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; }
-        .role-pill { padding: 10px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 2px solid #1e293b; flex: 1; font-size: 0.85rem; }
+        .role-pill { padding: 8px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 1px solid #1e293b; flex: 1; font-size: 0.85rem; }
         
-        /* TV DESIGN */
+        /* TV DESIGN - POPRAWIONY */
         .tv-row { background: var(--card); border-left: 15px solid transparent; padding: 30px; margin-bottom: 20px; display: flex; align-items: center; border-radius: 10px; border: 1px solid #1e293b; }
         .tv-t-num { width: 120px; font-size: 4rem; font-weight: 900; }
         .tv-main { flex: 1; }
         .tv-names-line { display: flex; align-items: center; justify-content: space-between; }
-        .tv-names { font-size: 3rem; font-weight: 800; text-transform: uppercase; }
-        .tv-marker { font-size: 1.4rem; color: var(--warn); font-weight: 700; margin-left: 30px; }
-        .tv-timer { width: 200px; text-align: right; font-size: 3.5rem; font-weight: 900; color: var(--accent); font-family: monospace; }
-        .league-label { font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; }
+        .tv-names { font-size: 2.8rem; font-weight: 800; text-transform: uppercase; }
+        .tv-marker { font-size: 1.4rem; color: var(--warn); font-weight: 700; margin-left: 30px; text-transform: uppercase; }
+        .tv-timer { width: 220px; text-align: right; font-size: 3.5rem; font-weight: 900; color: var(--accent); font-family: monospace; }
+        .league-label { font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; opacity: 0.7; }
 
-        .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; display: none; overflow-y: auto; }
-        .active-view { display: block !important; }
         .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); margin-right: 10px; display: inline-block; }
         select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
     </style>
@@ -46,21 +43,21 @@
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v69.5.1</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v69.5.2</h2>
         <div style="display:flex; gap:8px">
             <button onclick="showUI('tv-view')" class="btn" style="background:var(--accent); color:#000">PODGLĄD TV</button>
-            <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">CSV</button>
+            <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">IMPORT CSV</button>
             <input type="file" id="csvIn" style="display:none" onchange="doImport(this)">
         </div>
     </div>
-    <div id="tabs" style="margin-bottom:20px"></div>
+    <div id="tabs" style="margin-bottom:20px; overflow-x: auto; white-space: nowrap;"></div>
     <div id="matches"></div>
 </div>
 
 <div id="tv-view" class="modal-view">
     <div id="tv-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px">
         <h1 style="margin:0; letter-spacing:10px">LIVE TV</h1>
-        <button onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button>
+        <button onclick="showUI('admin-view')" class="btn" style="background:#fff; color:#000">POWRÓT DO ADMINA</button>
     </div>
     <div id="tv-list"></div>
 </div>
@@ -68,11 +65,11 @@
 <script>
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16 };
 
-    // --- LOGIKA STRAŻNIKA WIDOKU ---
+    // --- DETEKCJA TRYBU ---
     const urlParams = new URLSearchParams(window.location.search);
     const isTvMode = urlParams.get('view') === 'tv';
     if (isTvMode) {
-        document.body.classList.add('is-tv-only');
+        document.body.classList.add('is-tv-mode');
     }
 
     function triggerImport() { document.getElementById('csvIn').click(); }
@@ -92,26 +89,27 @@
 
     function refresh() {
         if(isTvMode) { renderTV(); return; }
+        
         const cur = state.leagues[state.idx];
         document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
-            <div class="tab" style="background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
+            <div class="tab" style="background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}; border-color:${l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
         `).join('');
 
         let html = '';
         cur.matches.forEach(m => {
             html += `<div class="match-card" style="border-left-color:${cur.color}">
-                <div style="width:50px">T${m.b}</div>
+                <div style="width:40px; font-weight:800; color:${cur.color}">T${m.b}</div>
                 <div class="role-pill">${m.h}</div>
-                <div style="opacity:0.3">VS</div>
+                <div style="opacity:0.3; font-weight:800">VS</div>
                 <div class="role-pill">${m.g}</div>
-                <div style="flex:1; padding-left:20px; color:var(--warn)">${m.m || '---'}</div>
+                <div style="flex:1; padding-left:20px; color:var(--warn); font-size:0.8rem">M: ${m.m || '---'}</div>
                 <div style="width:160px; text-align:right">
                     ${m.s==='plan' ? `<button onclick="start('${m.id}')" class="btn" style="background:var(--accent); color:#000">START</button>` : ''}
-                    ${m.s==='live' ? `<span style="color:var(--accent); margin-right:10px">${m.e}</span><button onclick="stop('${m.id}')" class="btn" style="background:var(--danger)">STOP</button>` : ''}
+                    ${m.s==='live' ? `<span style="color:var(--accent); font-weight:800; margin-right:10px">${m.e}</span><button onclick="stop('${m.id}')" class="btn" style="background:var(--danger); color:#fff">STOP</button>` : ''}
                 </div>
             </div>`;
         });
-        document.getElementById('matches').innerHTML = html || '<p style="opacity:0.2">BRAK MECZÓW - ZAIMPORTUJ CSV</p>';
+        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px">ZAIMPORTUJ PLIK CSV, ABY ZOBACZYĆ MECZE</p>';
     }
 
     function renderTV() {
@@ -131,12 +129,17 @@
                     </div>
                 </div>
                 <div class="tv-timer" id="tvt-${m.id}">${m.e}</div>
-            </div>`).join('') : '<h2 style="text-align:center; opacity:0.1; margin-top:100px">OCZEKIWANIE NA MECZE...</h2>';
+            </div>`).join('') : '<h2 style="text-align:center; opacity:0.1; margin-top:100px; letter-spacing:5px">BRAK MECZÓW LIVE</h2>';
     }
 
     function start(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } })); refresh(); }
     function stop(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id) m.s='done'; })); refresh(); }
-    function showUI(id) { document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view')); document.getElementById(id).classList.add('active-view'); if(id==='tv-view') renderTV(); }
+    
+    function showUI(id) { 
+        document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view')); 
+        document.getElementById(id).classList.add('active-view'); 
+        if(id==='tv-view') renderTV(); 
+    }
 
     setInterval(() => {
         state.leagues.forEach(l => l.matches.forEach(m => {
@@ -146,7 +149,7 @@
                 const el = document.getElementById('tvt-' + m.id); if(el) el.innerText = m.e;
             }
         }));
-        if(isTvMode) renderTV(); 
+        if(document.getElementById('tv-view').classList.contains('active-view') || isTvMode) renderTV(); 
     }, 1000);
 
     refresh();
