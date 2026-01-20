@@ -2,50 +2,46 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v62.9 - BOARDS MARKER FIX</title>
+    <title>Dart Manager Pro v63.2 - UI UNLOCK</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
-        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; }
+        .container { padding: 20px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 1; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
-        .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
+        .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; z-index: 10; }
         .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; }
         .role-pill { padding: 10px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 2px solid #1e293b; color: #fff; flex: 1; font-size: 0.85rem; }
-        .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; display: none; overflow-y: auto; }
-        .active-view { display: block !important; }
-        .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); text-transform: uppercase; font-size: 0.8rem; }
-        select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
         
-        /* STYL TV */
-        .tv-row { background: var(--card); border-left: 15px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 8px; border: 1px solid #1e293b; }
+        /* FIX: Modale nie mogą blokować przycisków jeśli są ukryte */
+        .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 40px; display: none; overflow-y: auto; }
+        .active-view { display: block !important; }
+        
+        .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); text-transform: uppercase; font-size: 0.8rem; }
+        .tv-row { background: var(--card); border-left: 15px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 8px; }
         .tv-t-num { width: 140px; font-size: 4rem; font-weight: 900; }
         .tv-main { flex: 1; text-align: center; }
         .tv-names { font-size: 3.5rem; font-weight: 800; }
-        .tv-timer { width: 250px; text-align: right; font-size: 3.5rem; color: var(--accent); font-family: monospace; font-variant-numeric: tabular-nums; }
-        .tv-marker { color: var(--warn); font-size: 1.5rem; font-weight: 700; margin-top: 5px; }
-
-        /* SIATKA TARCZ */
-        .boards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-        .board-box { padding: 20px; background: #000; border-radius: 12px; border: 2px solid #222; transition: 0.3s; }
-        .board-active { border-color: var(--accent); }
+        .tv-timer { width: 250px; text-align: right; font-size: 3.5rem; color: var(--accent); font-family: monospace; }
+        .tv-marker { color: var(--warn); font-size: 1.5rem; font-weight: 700; }
+        .boards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .board-box { padding: 20px; background: #000; border-radius: 12px; border: 2px solid #222; }
+        select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div id="admin-view" class="container">
+<div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER v62.9</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER v63.2</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
             <button onclick="showUI('tv-view')" class="btn" style="background:var(--accent); color:#000">TV</button>
             <button onclick="showUI('boards-view')" class="btn" style="background:#fff; color:#000">TARCZE</button>
             <button onclick="showUI('config-view')" class="btn" style="background:var(--warn); color:#000">OPCJE</button>
-            <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">CSV</button>
-            <input type="file" id="csvIn" style="display:none" onchange="doImport(this)">
         </div>
     </div>
     <div id="tabs" style="display:flex; gap:10px; margin-bottom:20px; overflow-x: auto;"></div>
@@ -53,24 +49,38 @@
 </div>
 
 <div id="tv-view" class="modal-view">
-    <div id="tv-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
         <h1 style="color:var(--accent); margin:0">LIVE SCOREBOARD</h1>
-        <button id="tv-exit-btn" onclick="exitTV()" class="btn" style="background:#333; color:#fff">POWRÓT ADMIN</button>
+        <button id="tv-back-btn" onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button>
     </div>
     <div id="tv-list"></div>
 </div>
 
 <div id="boards-view" class="modal-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
-        <h1 style="margin:0">PODGLĄD TARCZ</h1>
+        <h1>STATUS TARCZ</h1>
         <button onclick="showUI('admin-view')" class="btn" style="background:#fff">POWRÓT</button>
     </div>
     <div id="boards-grid" class="boards-grid"></div>
 </div>
 
+<div id="config-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center"><h1>USTAWIENIA</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
+    <div style="max-width:600px; margin-top:20px; background:var(--card); padding:20px; border-radius:12px">
+        <label>TARCZE:</label><input type="number" id="cfg-b" oninput="state.boards = parseInt(this.value)||1; sync();" style="width:100%; margin:10px 0">
+        <div id="cfg-l"></div>
+        <button onclick="addL()" class="btn" style="margin-top:15px; background:var(--purple); color:#fff; width:100%">+ DODAJ LIGĘ</button>
+    </div>
+</div>
+
 <div id="attendance-view" class="modal-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OBECNOŚĆ</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
-    <div id="attendance-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px"></div>
+    <div id="attendance-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px"></div>
+</div>
+
+<div id="timeline-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OŚ CZASU</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">POWRÓT</button></div>
+    <div id="timeline-container"></div>
 </div>
 
 <script>
@@ -83,69 +93,58 @@
         messagingSenderId: "521598880668",
         appId: "1:521598880668:web:2b3da8df46a86b41db1659"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref('dart_system_v62');
+    const db = firebase.database().ref('dart_system_v63');
 
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
+    let currentUI = 'admin-view';
     const isTVMode = window.location.search.includes('tv');
-    let currentUI = isTVMode ? 'tv-view' : 'admin-view';
 
     function sync() { db.set(state); }
-    db.on('value', (s) => { if(s.val()) { state = s.val(); if(isTVMode) currentUI = 'tv-view'; refresh(); } });
 
-    function refresh() {
-        if(currentUI === 'tv-view') renderTV();
-        else if(currentUI === 'boards-view') renderBoards();
-        else renderAdmin();
-        showUI(currentUI, true);
-    }
+    db.on('value', (s) => { 
+        if(s.val()) { 
+            state = s.val(); 
+            renderCurrent();
+        } 
+    });
 
-    function renderBoards() {
-        let h = '';
-        for(let i=1; i<=state.boards; i++) {
-            let m = null; 
-            state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
-            
-            h += `
-            <div class="board-box ${m?'board-active':''}" style="${m?`border-color:${m.col}`:''}">
-                <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
-                <div style="margin:10px 0; font-weight:800; min-height:40px; font-size:1.1rem">
-                    ${m ? `${m.h} vs ${m.g}` : '<span style="opacity:0.2">WOLNA</span>'}
-                </div>
-                <div style="color:var(--warn); font-weight:700; font-size:0.9rem; min-height:20px">
-                    ${m ? `MARKER: ${m.m || 'BRAK'}` : ''}
-                </div>
-                <div style="margin-top:10px; color:var(--accent); font-size:1.5rem; font-weight:800; font-family:monospace">
-                    ${m ? m.e : ''}
-                </div>
-            </div>`;
+    // Inicjalizacja trybu TV przy starcie
+    window.onload = () => {
+        if(isTVMode) {
+            currentUI = 'tv-view';
+            document.getElementById('tv-back-btn').style.display = 'none';
         }
-        document.getElementById('boards-grid').innerHTML = h;
+        renderCurrent();
+    };
+
+    function showUI(id) {
+        if(isTVMode) return; // Blokada dla linku ?tv
+        currentUI = id;
+        renderCurrent();
     }
 
-    function renderTV() {
-        let live = []; 
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
-        live.sort((a,b) => a.b - b.b);
-        const html = live.length ? live.map(m => `
-            <div class="tv-row" style="border-left-color:${m.col}">
-                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
-                <div class="tv-main">
-                    <div class="tv-names">${m.h} <span style="opacity:0.3">VS</span> ${m.g}</div>
-                    <div class="tv-marker">MARKER: ${m.m||'--'}</div>
-                </div>
-                <div class="tv-timer">${m.e}</div>
-            </div>`).join('') : '<h1 style="text-align:center; opacity:0.1; margin-top:200px; font-size:5rem">CZEKAMY NA MECZE...</h1>';
-        document.getElementById('tv-list').innerHTML = html;
+    function renderCurrent() {
+        // Ukryj wszystko
+        document.getElementById('admin-view').classList.remove('active-view');
+        document.querySelectorAll('.modal-view').forEach(m => m.classList.remove('active-view'));
+        
+        // Pokaż wybrane
+        document.getElementById(currentUI).classList.add('active-view');
+
+        // Renderowanie zależnie od widoku
+        if(currentUI === 'admin-view') renderAdmin();
+        if(currentUI === 'tv-view') renderTV();
+        if(currentUI === 'boards-view') renderBoards();
+        if(currentUI === 'config-view') renderConfig();
     }
 
     function renderAdmin() {
-        if(!state.leagues[state.idx]) state.idx = 0;
-        const cur = state.leagues[state.idx];
+        const cur = state.leagues[state.idx] || state.leagues[0];
         document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
-            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
+            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; renderAdmin();">${l.name}</div>
         `).join('');
+
         let h = '';
         (cur.matches || []).forEach(m => {
             h += `<div class="match-card" style="border-left-color:${cur.color}">
@@ -158,35 +157,61 @@
                 </div>
             </div>`;
         });
-        document.getElementById('matches').innerHTML = h || '<p>BRAK DANYCH</p>';
+        document.getElementById('matches').innerHTML = h || '<p>BRAK MECZÓW</p>';
     }
 
-    function showUI(id, isRefresh = false) {
-        if(!isRefresh) currentUI = id;
-        document.getElementById('admin-view').classList.remove('active-view');
-        document.querySelectorAll('.modal-view').forEach(m => m.classList.remove('active-view'));
-        const target = document.getElementById(id);
-        if(target) target.classList.add('active-view');
-        if(isTVMode) {
-            const btn = document.getElementById('tv-exit-btn');
-            if(btn) btn.style.display = 'none';
+    function renderTV() {
+        let live = []; 
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
+        live.sort((a,b) => a.b - b.b);
+        document.getElementById('tv-list').innerHTML = live.map(m => `
+            <div class="tv-row" style="border-left-color:${m.col}">
+                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
+                <div class="tv-main">
+                    <div class="tv-names">${m.h} VS ${m.g}</div>
+                    <div class="tv-marker">LICZY: ${m.m || '---'}</div>
+                </div>
+                <div class="tv-timer">${m.e}</div>
+            </div>`).join('') || '<h1 style="text-align:center; opacity:0.1; margin-top:100px">CZEKAMY...</h1>';
+    }
+
+    function renderBoards() {
+        let h = '';
+        for(let i=1; i<=state.boards; i++) {
+            let m = null; 
+            state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
+            h += `<div class="board-box" style="border-color:${m?m.col:'#222'}">
+                <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
+                <div style="font-weight:700; margin:10px 0">${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
+                <div style="color:var(--warn); font-weight:700; font-size:0.9rem">${m ? 'MARKER: '+(m.m||'--') : ''}</div>
+                <div style="font-size:1.5rem; color:var(--accent); font-weight:800">${m ? m.e : ''}</div>
+            </div>`;
         }
+        document.getElementById('boards-grid').innerHTML = h;
     }
 
-    function start(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } }); sync(); }
-    function stop(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id) m.s='done'; }); sync(); }
-    function exitTV() { currentUI = 'admin-view'; refresh(); }
+    function renderConfig() {
+        document.getElementById('cfg-b').value = state.boards;
+        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
+            <div style="display:flex; gap:10px; margin-bottom:10px">
+                <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; sync();" style="flex:1">
+                <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; sync();">
+            </div>
+        `).join('');
+    }
+
+    function start(id) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } })); sync(); }
+    function stop(id) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id) m.s='done'; })); sync(); }
+    function addL() { state.leagues.push({ name: 'NOWA', color: '#ffffff', matches: [] }); sync(); }
 
     setInterval(() => {
-        let changed = false;
         state.leagues.forEach(l => (l.matches||[]).forEach(m => {
             if(m.s === 'live' && m.start) {
                 const d = Math.floor((Date.now() - m.start) / 1000);
                 m.e = Math.floor(d/60).toString().padStart(2,'0')+':'+(d%60).toString().padStart(2,'0');
-                changed = true;
             }
         }));
-        if(changed) refresh();
+        if(currentUI === 'admin-view' || currentUI === 'tv-view' || currentUI === 'boards-view') renderCurrent();
     }, 1000);
 </script>
 </body>
