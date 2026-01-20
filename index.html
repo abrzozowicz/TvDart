@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v62.3 - ONLINE TURBO STABLE</title>
+    <title>Dart Manager Pro v62.5 - TURBO STABLE FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -24,30 +24,24 @@
         @keyframes a-flash { from { background: #450a0a; } to { background: var(--player-alert); } }
         .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 1000; padding: 40px; display: none; overflow-y: auto; }
         .active-view { display: block !important; }
-        .att-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-        .att-item { padding: 20px; text-align: center; background: #1e293b; border-radius: 12px; cursor: pointer; font-weight: 800; border: 3px solid transparent; text-transform: uppercase; }
-        .att-item.is-off { background: #450a0a !important; border-color: var(--danger) !important; }
         .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
-        .wo-tag { color: var(--danger); font-weight: 900; margin-left: 5px; }
         select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
         .tl-row { display: flex; align-items: center; background: #090e1a; margin-bottom: 4px; border-radius: 8px; padding: 10px; border: 1px solid #1e293b; }
         .tl-player { width: 200px; font-weight: 800; border-right: 2px solid #1e293b; margin-right: 15px; flex-shrink: 0; }
         .tl-box { width: 80px; height: 50px; border-radius: 6px; background: #161b22; font-size: 0.7rem; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 5px; }
         .tl-done { opacity: 0.2; filter: grayscale(1); }
-        .tl-live { border-color: #fff !important; animation: tl-pulse 1s infinite alternate; }
-        @keyframes tl-pulse { from { opacity: 1; transform: scale(1.05); } to { opacity: 0.5; transform: scale(1); } }
         .tv-row { background: var(--card); border-left: 12px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 4px; }
         .tv-t-num { width: 120px; font-size: 3rem; font-weight: 900; }
         .tv-main { flex: 1; text-align: center; }
         .tv-names { font-size: 2.5rem; font-weight: 800; }
-        .tv-timer { width: 200px; text-align: right; font-size: 2.5rem; color: var(--accent); font-family: monospace; font-variant-numeric: tabular-nums; }
+        .tv-timer { width: 200px; text-align: right; font-size: 2.5rem; color: var(--accent); font-family: monospace; }
     </style>
 </head>
 <body>
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART ONLINE v62.3</h2>
+        <h2 style="margin:0; color:var(--accent)">DART ONLINE v62.5</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
@@ -69,7 +63,7 @@
 
 <div id="attendance-view" class="modal-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>OBECNOŚĆ</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent)">ZAPISZ</button></div>
-    <div id="attendance-list" class="att-grid"></div>
+    <div id="attendance-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px"></div>
 </div>
 
 <div id="config-view" class="modal-view">
@@ -82,10 +76,12 @@
 </div>
 
 <div id="tv-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px"><h1 style="color:var(--accent); margin:0">LIVE STREAM</h1><button onclick="showUI('admin-view')" class="btn" style="background:#333; color:#fff">POWRÓT</button></div>
     <div id="tv-list"></div>
 </div>
 
 <div id="boards-view" class="modal-view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px"><h1 style="margin:0">PODGLĄD TARCZ</h1><button onclick="showUI('admin-view')" class="btn" style="background:#333; color:#fff">POWRÓT</button></div>
     <div id="boards-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px"></div>
 </div>
 
@@ -143,8 +139,8 @@
             </div>`).join('');
 
         let html = '';
-        const matchesArr = cur.matches || [];
-        const grouped = matchesArr.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
+        const mArr = cur.matches || [];
+        const grouped = mArr.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
         Object.keys(grouped).sort().forEach(time => {
             html += `<div style="color:var(--warn); margin:15px 0 5px 0; font-size:0.8rem; font-weight:800">🕒 GODZINA ${time}</div>`;
             grouped[time].forEach(m => {
@@ -154,7 +150,7 @@
                 const pClass = (s, a) => `role-pill ${a?'absent-alert':(s==='playing'?'is-playing':(s==='marking'?'is-marking':''))}`;
 
                 html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}; opacity:${(m.s==='done'||m.isWalkover)?0.5:1}">
-                    <div style="width:65px"><select onchange="upd('${m.id}','b',parseInt(this.value))" class="${isOccupied?'is-playing':''}">
+                    <div style="width:65px"><select onchange="upd('${m.id}','b',parseInt(this.value))">
                         ${Array.from({length:state.boards},(_,i)=>`<option value="${i+1}" ${m.b==i+1?'selected':''}>T${i+1}</option>`).join('')}
                     </select></div>
                     <div class="${pClass(hS, hA)}">${m.h}${m.woLoser===m.h?' (W)':''}</div>
@@ -172,10 +168,9 @@
                 </div>`;
             });
         });
-        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.3">ZAIMPORTUJ CSV LUB DODAJ LIGĘ</p>';
-        
-        if(document.getElementById('tv-view').classList.contains('active-view')) renderTV();
-        if(document.getElementById('boards-view').classList.contains('active-view')) renderBoards();
+        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.3">KLIKNIJ CSV ABY ZAŁADOWAĆ MECZE DLA TEJ LIGI</p>';
+        const act = document.querySelector('.modal-view.active-view')?.id;
+        if(act==='tv-view') renderTV(); if(act==='boards-view') renderBoards();
     }
 
     function start(id) { state.leagues[state.idx].matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } }); sync(); }
@@ -195,17 +190,22 @@
         sync();
     }
 
+    function triggerImport() { document.getElementById('csvIn').value = ''; document.getElementById('csvIn').click(); }
+
     function doImport(input) {
         const file = input.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const lines = e.target.result.split(/\r?\n/).filter(l => l.length > 1);
             const sep = lines[0].includes(';') ? ';' : ',';
-            state.leagues[state.idx].matches = lines.slice(1).map(l => {
+            const newMatches = lines.slice(1).map(l => {
                 const c = l.split(sep).map(x => x.trim());
                 return { id: 'm-'+Math.random().toString(36).substr(2,9), b: parseInt(c[0])||1, t: c[1]||'00:00', h: c[2], g: c[3], m: c[4]||'', s: 'plan', e: '00:00', start: null, isWalkover: false };
             });
+            // KLUCZOWA POPRAWKA: Precyzyjne przypisanie do aktualnego indeksu
+            state.leagues[state.idx].matches = newMatches;
             sync();
+            input.value = ''; // Reset inputa
         };
         reader.readAsText(file);
     }
@@ -217,8 +217,8 @@
             let evs = [];
             state.leagues.forEach(l => (l.matches||[]).forEach(m => { 
                 if(m.h===p || m.g===p || m.m===p) {
-                    const isAnyAbsent = (state.absentPlayers||[]).includes(m.h) || (state.absentPlayers||[]).includes(m.g) || (m.m && (state.absentPlayers||[]).includes(m.m));
-                    evs.push({ t:m.t, r:(m.h===p||m.g===p?'P':'M'), s:m.s, a: isAnyAbsent }); 
+                    const isAnyA = (state.absentPlayers||[]).includes(m.h) || (state.absentPlayers||[]).includes(m.g) || (m.m && (state.absentPlayers||[]).includes(m.m));
+                    evs.push({ t:m.t, r:(m.h===p||m.g===p?'P':'M'), s:m.s, a: isAnyA }); 
                 }
             }));
             evs.sort((a,b)=>a.t.localeCompare(b.t));
@@ -235,14 +235,15 @@
     }
 
     function renderTV() {
-        let live = []; state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
+        let live = []; 
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
         live.sort((a,b) => a.b - b.b);
-        document.getElementById('tv-list').innerHTML = live.map(m => `
+        document.getElementById('tv-list').innerHTML = live.length ? live.map(m => `
             <div class="tv-row" style="border-left-color:${m.col}">
                 <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
                 <div class="tv-main"><div class="tv-names">${m.h} VS ${m.g}</div><div style="color:var(--warn)">LICZY: ${m.m||'--'}</div></div>
                 <div class="tv-timer">${m.e}</div>
-            </div>`).join('');
+            </div>`).join('') : '<h2 style="text-align:center; opacity:0.3; margin-top:50px">BRAK TRWAJĄCYCH MECZÓW</h2>';
     }
 
     function renderBoards() {
@@ -251,8 +252,8 @@
             let m = null; state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
             h += `<div style="padding:20px; background:#000; border:2px solid ${m?m.col:'#222'}; border-radius:12px">
                 <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
-                <div>${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
-                <div style="color:var(--accent)">${m?m.e:''}</div>
+                <div style="height:30px; margin:10px 0">${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
+                <div style="color:var(--accent); font-weight:800">${m?m.e:''}</div>
             </div>`;
         }
         document.getElementById('boards-grid').innerHTML = h;
@@ -276,13 +277,8 @@
     function showUI(id) {
         document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view'));
         document.getElementById(id).classList.add('active-view');
-        if(id==='tv-view') renderTV();
-        if(id==='boards-view') renderBoards();
+        if(id==='tv-view') renderTV(); if(id==='boards-view') renderBoards();
     }
-
-    function triggerImport() { document.getElementById('csvIn').click(); }
-
-    if(window.location.search.includes('tv')) showUI('tv-view');
 
     setInterval(() => {
         state.leagues.forEach(l => (l.matches||[]).forEach(m => {
@@ -291,8 +287,8 @@
                 m.e = Math.floor(d/60).toString().padStart(2,'0')+':'+(d%60).toString().padStart(2,'0');
             }
         }));
-        if(document.querySelector('.active-view').id === 'tv-view') renderTV();
-        if(document.querySelector('.active-view').id === 'boards-view') renderBoards();
+        const cv = document.querySelector('.modal-view.active-view')?.id;
+        if(cv === 'tv-view') renderTV(); if(cv === 'boards-view') renderBoards();
     }, 1000);
 </script>
 </body>
