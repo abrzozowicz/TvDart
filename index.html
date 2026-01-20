@@ -2,17 +2,11 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v61.4.8 - TV FIX</title>
+    <title>Dart Manager Pro v61.4.7 - TIMELINE FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; --player-alert: #ff4500; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
-        
-        /* TRYB TV - TYLKO GDY BODY MA KLASĘ TV-MODE */
-        body.tv-mode #admin-view, body.tv-mode .header { display: none !important; }
-        body.tv-mode #tv-view { display: block !important; position: fixed; inset: 0; background: var(--bg); z-index: 9999; padding: 40px; }
-        body.tv-mode .tv-return-btn { display: none !important; }
-
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
         .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
@@ -43,6 +37,7 @@
         
         select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
         
+        /* OŚ CZASU - SIATKA */
         .tl-row { display: flex; align-items: center; background: #090e1a; margin-bottom: 4px; border-radius: 8px; padding: 10px; border: 1px solid #1e293b; }
         .tl-player { width: 200px; font-weight: 800; border-right: 2px solid #1e293b; margin-right: 15px; flex-shrink: 0; }
         .tl-grid { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -51,6 +46,7 @@
         .tl-live { border-color: #fff !important; animation: tl-pulse 1s infinite alternate; box-shadow: 0 0 10px rgba(255,255,255,0.2); z-index: 10; }
         @keyframes tl-pulse { from { opacity: 1; transform: scale(1.05); } to { opacity: 0.5; transform: scale(1); } }
 
+        /* FIX TV - ABSOLUTNY BRAK RUCHU */
         .tv-row { background: var(--card); border-left: 12px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 4px; }
         .tv-t-num { width: 120px; font-size: 3rem; font-weight: 900; flex-shrink: 0; }
         .tv-main { flex: 1; text-align: center; overflow: hidden; }
@@ -65,17 +61,22 @@
             font-family: 'Courier New', Courier, monospace;
             font-variant-numeric: tabular-nums;
         }
+
+        /* STYL TYLKO DLA TRYBU TV PRZEZ URL */
+        body.url-tv-mode #admin-view { display: none !important; }
+        body.url-tv-mode #tv-view { display: block !important; position: fixed; inset: 0; z-index: 9999; background: var(--bg); }
+        body.url-tv-mode .tv-back-btn { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v61.4.8</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER PRO v61.4.7</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
-            <button onclick="toggleTVView()" class="btn" style="background:var(--accent); color:#000">TRYB TV (FULL)</button>
+            <button onclick="window.open(window.location.href + (window.location.search ? '&' : '?') + 'view=tv', '_blank')" class="btn" style="background:var(--accent); color:#000">LINK TV 🔗</button>
             <button onclick="showUI('boards-view')" class="btn" style="background:#fff; color:#000">TARCZE</button>
             <button onclick="showUI('config-view')" class="btn" style="background:var(--warn); color:#000">USTAWIENIA</button>
             <button onclick="triggerImport()" class="btn" style="background:#333; color:#fff">CSV</button>
@@ -106,7 +107,7 @@
 </div>
 
 <div id="tv-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>LIVE TV</h1><button onclick="toggleTVView()" class="btn tv-return-btn" style="background:#fff">POWRÓT DO ADMINA</button></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px"><h1>LIVE TV</h1><button onclick="showUI('admin-view')" class="btn tv-back-btn" style="background:#fff">POWRÓT</button></div>
     <div id="tv-list"></div>
 </div>
 
@@ -118,15 +119,18 @@
 <script>
     let state = { leagues: [{ name: 'LIGA 1', color: '#00ff95', matches: [] }], idx: 0, boards: 16, absentPlayers: [] };
 
-    // FUNKCJA PRZEŁĄCZANIA WIDOKU BEZ ODŚWIEŻANIA
-    function toggleTVView() {
-        const isTV = document.body.classList.toggle('tv-mode');
-        if(isTV) renderTV();
+    // FUNKCJA ZAPISU DO PAMIĘCI (LocalStorage)
+    function saveToLocal() {
+        localStorage.setItem('dart_manager_data', JSON.stringify(state));
     }
 
-    // SPRAWDZENIE STARTOWE (JEŚLI KTOŚ RĘCZNIE WPISZE URL)
-    if (window.location.search.includes('view=tv')) {
-        document.body.classList.add('tv-mode');
+    // FUNKCJA WCZYTYWANIA Z PAMIĘCI
+    function loadFromLocal() {
+        const saved = localStorage.getItem('dart_manager_data');
+        if (saved) {
+            state = JSON.parse(saved);
+            refresh();
+        }
     }
 
     function triggerImport() { document.getElementById('csvIn').click(); }
@@ -142,6 +146,7 @@
                 return { id: 'm-'+Math.random().toString(36).substr(2,9), b: parseInt(c[0])||1, t: c[1]||'00:00', h: c[2], g: c[3], m: c[4]||'', s: 'plan', e: '00:00', start: null, isWalkover: false, woLoser: null };
             });
             input.value = '';
+            saveToLocal();
             refresh();
         };
         reader.readAsText(file);
@@ -167,18 +172,26 @@
     function refresh() {
         const allP = getAllPlayers();
         const cur = state.leagues[state.idx];
-        document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
-            <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
-        `).join('');
+        const tabsEl = document.getElementById('tabs');
+        if(tabsEl) {
+            tabsEl.innerHTML = state.leagues.map((l, i) => `
+                <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
+            `).join('');
+        }
 
-        document.getElementById('cfg-b').value = state.boards;
-        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
-            <div style="display:flex; gap:10px; margin-bottom:10px">
-                <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; refresh();" style="flex:1">
-                <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; refresh();">
-                <button onclick="if(state.leagues.length>1){state.leagues.splice(${i},1); state.idx=0; refresh();}" class="btn" style="background:var(--danger)">X</button>
-            </div>
-        `).join('');
+        const cfgB = document.getElementById('cfg-b');
+        if(cfgB) cfgB.value = state.boards;
+        
+        const cfgL = document.getElementById('cfg-l');
+        if(cfgL) {
+            cfgL.innerHTML = state.leagues.map((l, i) => `
+                <div style="display:flex; gap:10px; margin-bottom:10px">
+                    <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; refresh();" style="flex:1">
+                    <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; refresh();">
+                    <button onclick="if(state.leagues.length>1){state.leagues.splice(${i},1); state.idx=0; refresh();}" class="btn" style="background:var(--danger)">X</button>
+                </div>
+            `).join('');
+        }
 
         let html = '';
         const grouped = cur.matches.reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
@@ -211,7 +224,10 @@
                 </div>`;
             });
         });
-        document.getElementById('matches').innerHTML = html || '<p style="text-align:center; opacity:0.2; padding:40px">WYBIERZ LIGĘ I ZAIMPORTUJ CSV</p>';
+        const matchesEl = document.getElementById('matches');
+        if(matchesEl) matchesEl.innerHTML = html || '<p style="text-align:center; opacity:0.2; padding:40px">WYBIERZ LIGĘ I ZAIMPORTUJ CSV</p>';
+        
+        saveToLocal();
         renderTV();
         renderBoards();
     }
@@ -258,15 +274,18 @@
     function renderTV() {
         let live = []; state.leagues.forEach(l => l.matches.forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
         live.sort((a,b) => a.b - b.b);
-        document.getElementById('tv-list').innerHTML = live.map(m => `
-            <div class="tv-row" style="border-left-color:${m.col}">
-                <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
-                <div class="tv-main">
-                    <div class="tv-names">${m.h} <span style="opacity:0.2">VS</span> ${m.g}</div>
-                    <div style="color:var(--warn); font-size:1rem; font-weight:700">LICZY: ${m.m || '---'}</div>
-                </div>
-                <div class="tv-timer" id="tvt-${m.id}">${m.e}</div>
-            </div>`).join('');
+        const tvList = document.getElementById('tv-list');
+        if(tvList) {
+            tvList.innerHTML = live.map(m => `
+                <div class="tv-row" style="border-left-color:${m.col}">
+                    <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
+                    <div class="tv-main">
+                        <div class="tv-names">${m.h} <span style="opacity:0.2">VS</span> ${m.g}</div>
+                        <div style="color:var(--warn); font-size:1rem; font-weight:700">LICZY: ${m.m || '---'}</div>
+                    </div>
+                    <div class="tv-timer" id="tvt-${m.id}">${m.e}</div>
+                </div>`).join('');
+        }
     }
 
     function renderBoards() {
@@ -280,7 +299,8 @@
                 <div style="font-size:1.1rem; color:var(--accent); font-weight:800; font-variant-numeric:tabular-nums" id="bt-${m?m.id:''}">${m?m.e:''}</div>
             </div>`;
         }
-        document.getElementById('boards-grid').innerHTML = h;
+        const boardsGrid = document.getElementById('boards-grid');
+        if(boardsGrid) boardsGrid.innerHTML = h;
     }
 
     function start(id) { state.leagues.forEach(l => l.matches.forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } })); refresh(); }
@@ -312,7 +332,23 @@
             }
         }));
     }, 1000);
-    refresh();
+
+    // --- LOGIKA URL SYNC ---
+    function checkUrlMode() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('view') === 'tv') {
+            document.body.classList.add('url-tv-mode');
+            showUI('tv-view');
+        }
+    }
+
+    // Synchronizacja między kartami (LocalStorage event)
+    window.addEventListener('storage', () => {
+        loadFromLocal();
+    });
+
+    loadFromLocal();
+    checkUrlMode();
 </script>
 </body>
 </html>
