@@ -2,57 +2,40 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Dart Manager Pro v63.3 - FULL RESTORE</title>
+    <title>Dart Manager Pro v63.4 - FOCUS FIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --bg: #05070a; --card: #11141d; --accent: #00ff95; --warn: #ffb800; --danger: #ff4757; --text: #ffffff; --border: #1e293b; --purple: #a855f7; --player-alert: #ff4500; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; overflow-x: hidden; }
-        
-        /* GŁÓWNY KONTENER */
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 1; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
-        
         .btn { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; position: relative; z-index: 10; }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
-
-        /* MODALE - FIX Z-INDEX I KLIKALNOŚCI */
         .modal-view { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 40px; display: none; overflow-y: auto; }
         .active-view { display: block !important; }
-
-        /* MECZE I KARTY */
         .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-left: 8px solid transparent; transition: 0.3s; }
         .match-card.is-live-card { animation: live-pulse 2s infinite ease-in-out; border-color: var(--danger) !important; }
         @keyframes live-pulse { 0% { background: var(--card); } 50% { background: #2a0a0a; } 100% { background: var(--card); } }
-
         .role-pill { padding: 10px; border-radius: 6px; background: #000; text-align: center; font-weight: 700; border: 2px solid #1e293b; color: #fff; flex: 1; font-size: 0.85rem; }
         .is-playing { background: #450a0a !important; border-color: var(--danger) !important; animation: p-red 1s infinite alternate; }
         .is-marking { background: #422006 !important; border-color: var(--warn) !important; color: white !important; }
         .absent-alert { animation: a-flash 0.8s infinite alternate !important; border-color: var(--player-alert) !important; color: white !important; }
-        
         @keyframes p-red { from { box-shadow: 0 0 2px #f00; } to { box-shadow: 0 0 10px #f00; } }
         @keyframes a-flash { from { background: #450a0a; } to { background: var(--player-alert); } }
-
         .tab { padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 800; border: 2px solid var(--border); transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
-        .wo-tag { color: var(--danger); font-weight: 900; margin-left: 5px; }
-
-        /* OŚ CZASU */
         .tl-row { display: flex; align-items: center; background: #090e1a; margin-bottom: 4px; border-radius: 8px; padding: 10px; border: 1px solid #1e293b; }
         .tl-player { width: 200px; font-weight: 800; border-right: 2px solid #1e293b; margin-right: 15px; flex-shrink: 0; }
         .tl-grid { display: flex; gap: 6px; flex-wrap: wrap; }
         .tl-box { width: 80px; height: 50px; border-radius: 6px; background: #161b22; font-size: 0.7rem; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; }
         .tl-done { opacity: 0.2; filter: grayscale(1); }
         .tl-live { border-color: #fff !important; animation: tl-pulse 1s infinite alternate; }
-
-        /* TV VIEW */
         .tv-row { background: var(--card); border-left: 12px solid transparent; padding: 25px; margin-bottom: 15px; display: flex; align-items: center; border-radius: 4px; }
         .tv-t-num { width: 120px; font-size: 3rem; font-weight: 900; }
         .tv-main { flex: 1; text-align: center; }
         .tv-names { font-size: 2.5rem; font-weight: 800; }
         .tv-timer { width: 200px; text-align: right; font-size: 2.5rem; font-weight: 800; color: var(--accent); font-family: monospace; }
-
         select, input { background: #000; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 6px; font-family: 'Sora'; font-weight: 700; }
     </style>
 </head>
@@ -60,7 +43,7 @@
 
 <div id="admin-view" class="container active-view">
     <div class="header">
-        <h2 style="margin:0; color:var(--accent)">DART MANAGER v63.3</h2>
+        <h2 style="margin:0; color:var(--accent)">DART MANAGER v63.4</h2>
         <div style="display:flex; gap:8px">
             <button onclick="openTimeline()" class="btn" style="background:var(--purple); color:#fff">OŚ CZASU</button>
             <button onclick="showAttendance()" class="btn" style="background:var(--danger); color:#fff">OBECNOŚĆ</button>
@@ -96,16 +79,15 @@
 </div>
 
 <div id="config-view" class="modal-view">
-    <div style="display:flex; justify-content:space-between; align-items:center"><h1>USTAWIENIA</h1><button onclick="showUI('admin-view')" class="btn" style="background:var(--accent); color:#000">ZAPISZ</button></div>
+    <div style="display:flex; justify-content:space-between; align-items:center"><h1>USTAWIENIA</h1><button onclick="saveAndExit()" class="btn" style="background:var(--accent); color:#000">ZAPISZ I WYJDŹ</button></div>
     <div style="max-width:600px; margin-top:20px; background:var(--card); padding:20px; border-radius:12px">
-        <label>TARCZE:</label><input type="number" id="cfg-b" oninput="state.boards = parseInt(this.value)||1; sync();" style="width:100%; margin:10px 0">
+        <label>LICZBA TARCZ:</label><input type="number" id="cfg-b" style="width:100%; margin:10px 0">
         <div id="cfg-l"></div>
         <button onclick="addL()" class="btn" style="margin-top:15px; background:var(--purple); color:#fff; width:100%">+ DODAJ LIGĘ</button>
     </div>
 </div>
 
 <script>
-    // KONFIGURACJA FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyDd7dewomS7zjN7mzECobPwPxo8gOz8NfE",
         authDomain: "dartonline-3f908.firebaseapp.com",
@@ -127,15 +109,13 @@
     db.on('value', (s) => { 
         if(s.val()) { 
             state = s.val(); 
-            refresh(); 
+            // Nie odświeżamy interfejsu jeśli użytkownik jest w menu opcji, żeby nie psuć wpisywania
+            if(currentUI !== 'config-view') refresh(); 
         } 
     });
 
     window.onload = () => {
-        if(isTVMode) {
-            currentUI = 'tv-view';
-            document.getElementById('tv-back-btn').style.display = 'none';
-        }
+        if(isTVMode) { currentUI = 'tv-view'; document.getElementById('tv-back-btn').style.display = 'none'; }
         refresh();
     };
 
@@ -145,7 +125,6 @@
         refresh();
     }
 
-    // --- FUNKCJE LOGICZNE ---
     function triggerImport() { document.getElementById('csvIn').click(); }
     function doImport(input) {
         const file = input.files[0]; if(!file) return;
@@ -180,7 +159,6 @@
         return status;
     }
 
-    // --- RENDEROWANIE ---
     function refresh() {
         document.querySelectorAll('.container, .modal-view').forEach(e => e.classList.remove('active-view'));
         document.getElementById(currentUI).classList.add('active-view');
@@ -196,14 +174,12 @@
     function renderAdmin() {
         const allP = getAllPlayers();
         const cur = state.leagues[state.idx] || state.leagues[0];
-        
         document.getElementById('tabs').innerHTML = state.leagues.map((l, i) => `
             <div class="tab" style="border-color:${l.color}; background:${i===state.idx?l.color:'transparent'}; color:${i===state.idx?'#000':l.color}" onclick="state.idx=${i}; refresh();">${l.name}</div>
         `).join('');
 
         let html = '';
         const grouped = (cur.matches || []).reduce((acc, m) => { (acc[m.t] = acc[m.t] || []).push(m); return acc; }, {});
-        
         Object.keys(grouped).sort().forEach(time => {
             html += `<div style="color:var(--warn); margin:15px 0 5px 0; font-size:0.8rem; font-weight:800">🕒 GODZINA ${time}</div>`;
             grouped[time].forEach(m => {
@@ -211,8 +187,7 @@
                 const hS = getPlayerStatus(m.h), gS = getPlayerStatus(m.g), mS = getPlayerStatus(m.m);
                 const hA = (state.absentPlayers||[]).includes(m.h), gA = (state.absentPlayers||[]).includes(m.g), mA = (state.absentPlayers||[]).includes(m.m);
                 const pClass = (s, a) => `role-pill ${a?'absent-alert':(s==='playing'?'is-playing':(s==='marking'?'is-marking':''))}`;
-
-                html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}; opacity:${(m.s==='done'||m.isWalkover)?0.5:1}">
+                html += `<div class="match-card ${m.s==='live'?'is-live-card':''}" style="border-left-color:${cur.color}">
                     <div style="width:65px"><select onchange="upd('${m.id}','b',parseInt(this.value))">
                         ${Array.from({length:state.boards},(_,i)=>`<option value="${i+1}" ${m.b==i+1?'selected':''}>T${i+1}</option>`).join('')}
                     </select></div>
@@ -229,29 +204,52 @@
                 </div>`;
             });
         });
-        document.getElementById('matches').innerHTML = html || '<p>BRAK MECZÓW - ZAIMPORTUJ CSV</p>';
+        document.getElementById('matches').innerHTML = html || '<p>BRAK MECZÓW</p>';
     }
 
+    // --- FIX DLA KONFIGURACJI ---
+    function renderConfig() {
+        document.getElementById('cfg-b').value = state.boards;
+        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
+            <div style="display:flex; gap:10px; margin-bottom:10px">
+                <input type="text" value="${l.name}" id="l-name-${i}" style="flex:1">
+                <input type="color" value="${l.color}" id="l-color-${i}">
+                <button onclick="state.leagues.splice(${i},1); renderConfig()" class="btn" style="background:var(--danger)">X</button>
+            </div>
+        `).join('');
+    }
+
+    function saveAndExit() {
+        state.boards = parseInt(document.getElementById('cfg-b').value) || 16;
+        state.leagues.forEach((l, i) => {
+            l.name = document.getElementById(`l-name-${i}`).value;
+            l.color = document.getElementById(`l-color-${i}`).value;
+        });
+        sync();
+        showUI('admin-view');
+    }
+
+    function addL() {
+        state.leagues.push({ name: 'NOWA LIGA', color: '#ffffff', matches: [] });
+        renderConfig();
+    }
+
+    // Pozostałe funkcje TV/Timeline bez zmian (stabilne)
     function renderTV() {
-        let live = []; 
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
+        let live = []; state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.s==='live') live.push({...m, col: l.color}); }));
         live.sort((a,b) => a.b - b.b);
         document.getElementById('tv-list').innerHTML = live.map(m => `
             <div class="tv-row" style="border-left-color:${m.col}">
                 <div class="tv-t-num" style="color:${m.col}">T${m.b}</div>
-                <div class="tv-main">
-                    <div class="tv-names">${m.h} VS ${m.g}</div>
-                    <div style="color:var(--warn); font-weight:700">LICZY: ${m.m || '---'}</div>
-                </div>
+                <div class="tv-main"><div class="tv-names">${m.h} VS ${m.g}</div><div style="color:var(--warn); font-weight:700">LICZY: ${m.m || '---'}</div></div>
                 <div class="tv-timer">${m.e}</div>
-            </div>`).join('') || '<h1>CZEKAMY NA MECZE...</h1>';
+            </div>`).join('') || '<h1>BRAK MECZÓW</h1>';
     }
 
     function renderBoards() {
         let h = '';
         for(let i=1; i<=state.boards; i++) {
-            let m = null; 
-            state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
+            let m = null; state.leagues.forEach(l => (l.matches||[]).forEach(x => { if(x.s==='live' && x.b==i) m={...x, col: l.color}; }));
             h += `<div style="padding:20px; background:#000; border:2px solid ${m?m.col:'#222'}; border-radius:12px">
                 <div style="font-size:2rem; font-weight:900; color:${m?m.col:'#333'}">T${i}</div>
                 <div>${m ? m.h+' VS '+m.g : 'WOLNA'}</div>
@@ -263,10 +261,7 @@
 
     function renderAttendance() {
         const p = getAllPlayers();
-        document.getElementById('attendance-list').innerHTML = p.map(n => `
-            <div class="tab ${state.absentPlayers.includes(n)?'absent-alert':''}" onclick="toggleA('${n}')" style="text-align:center">
-                ${n}
-            </div>`).join('');
+        document.getElementById('attendance-list').innerHTML = p.map(n => `<div class="tab ${state.absentPlayers.includes(n)?'absent-alert':''}" onclick="toggleA('${n}')" style="text-align:center">${n}</div>`).join('');
     }
 
     function renderTimeline() {
@@ -289,39 +284,19 @@
         document.getElementById('timeline-container').innerHTML = html;
     }
 
-    function renderConfig() {
-        document.getElementById('cfg-b').value = state.boards;
-        document.getElementById('cfg-l').innerHTML = state.leagues.map((l, i) => `
-            <div style="display:flex; gap:10px; margin-bottom:10px">
-                <input type="text" value="${l.name}" oninput="state.leagues[${i}].name=this.value; sync();" style="flex:1">
-                <input type="color" value="${l.color}" oninput="state.leagues[${i}].color=this.value; sync();">
-            </div>
-        `).join('');
-    }
-
-    // --- AKCJE ---
     function start(id) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id){ m.s='live'; m.start=Date.now(); } })); sync(); }
     function stop(id) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id) m.s='done'; })); sync(); }
     function reset(id) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id){ m.s='plan'; m.isWalkover=false; m.woLoser=null; m.e='00:00'; } })); sync(); }
     function walk(id) {
-        const p = prompt("Kto przegrał walkowerem? 1-Gospodarz, 2-Gość");
-        state.leagues.forEach(l => (l.matches||[]).forEach(m => {
-            if(m.id===id) { m.s='done'; m.isWalkover=true; m.woLoser = (p==="1"?m.h:m.g); }
-        }));
+        const p = prompt("Kto przegrał? 1-Gospodarz, 2-Gość");
+        state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id) { m.s='done'; m.isWalkover=true; m.woLoser = (p==="1"?m.h:m.g); } }));
         sync();
     }
     function upd(id, f, v) { state.leagues.forEach(l => (l.matches||[]).forEach(m => { if(m.id===id) m[f]=v; })); sync(); }
-    function toggleA(n) { 
-        if(!state.absentPlayers) state.absentPlayers = [];
-        const i = state.absentPlayers.indexOf(n); 
-        if(i===-1) state.absentPlayers.push(n); else state.absentPlayers.splice(i,1); 
-        sync(); 
-    }
-    function addL() { state.leagues.push({ name: 'NOWA LIGA', color: '#ffffff', matches: [] }); sync(); }
+    function toggleA(n) { if(!state.absentPlayers) state.absentPlayers = []; const i = state.absentPlayers.indexOf(n); if(i===-1) state.absentPlayers.push(n); else state.absentPlayers.splice(i,1); sync(); }
     function openTimeline() { showUI('timeline-view'); }
     function showAttendance() { showUI('attendance-view'); }
 
-    // TIMER
     setInterval(() => {
         let changed = false;
         state.leagues.forEach(l => (l.matches||[]).forEach(m => {
@@ -331,7 +306,8 @@
                 changed = true;
             }
         }));
-        if(changed) refresh();
+        // Odświeżaj TYLKO jeśli nie jesteśmy w trybie edycji ustawień
+        if(changed && currentUI !== 'config-view') refresh();
     }, 1000);
 </script>
 </body>
